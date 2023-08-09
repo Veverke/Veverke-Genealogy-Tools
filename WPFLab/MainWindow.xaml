@@ -25,6 +25,9 @@
             <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnShowCausesOfDeathDistribution" Click="btnShowCausesOfDeathDistribution_Click">
                 Causes Of Death Distribution
             </Button>
+            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnExportToJson" Click="btnExportToJson_Click">
+                Export to JSON
+            </Button>
         </StackPanel>
         <ScrollViewer>
             <StackPanel DockPanel.Dock="Bottom">

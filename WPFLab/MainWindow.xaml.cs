@@ -1,6 +1,8 @@
 ﻿using GenealogySoftwareV3.Types;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,6 +96,27 @@ namespace WPFLab
         private ListViewItem GetListViewItem(int itemIndex, string content)
         {
             return new ListViewItem { Background = GetListItemBackgroundColor(itemIndex), BorderBrush = Brushes.Black, Content = content};
+        }
+
+        private void btnExportToJson_Click(object sender, RoutedEventArgs e)
+        {
+            var json =
+                JsonConvert.SerializeObject(
+                new
+                {
+                    //Individuals = new {
+                    //    ofdGEDCOM.fileInterpreter.Individuals.Values.Count,
+                    //    Individuals = ofdGEDCOM.fileInterpreter.Individuals.Values
+                    //},
+                    //Marriages = new {
+                    //    ofdGEDCOM.fileInterpreter.Marriages.Values.Count,
+                    //    Marriages = ofdGEDCOM.fileInterpreter.Marriages.Values
+                    //}
+                    Individuals = ofdGEDCOM.fileInterpreter.Individuals.Values,
+                    Marriages = ofdGEDCOM.fileInterpreter.Marriages.Values
+                }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+            File.WriteAllText($"gedcom-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.json", json);
         }
     }
 }
