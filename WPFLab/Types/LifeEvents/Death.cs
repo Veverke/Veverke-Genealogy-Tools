@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GenealogySoftwareV3.Types;
+using WPFGedcomParser.Types;
 
 namespace WPFLab.Types.LifeEvents
 {

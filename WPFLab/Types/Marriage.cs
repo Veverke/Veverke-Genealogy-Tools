@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using WPFLab.Types.LifeEvents;
 
-namespace GenealogySoftwareV3.Types
+namespace WPFGedcomParser.Types
 {
     public class Marriage : LifeEvent
     {

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" BorderBrush="Gold"  Background="SkyBlue">
+        Title="Veverke's GEDCOM Parser" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -17,12 +17,18 @@
                 <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
             </MenuItem>
         </Menu>
-        <ScrollViewer>
-            <StackPanel DockPanel.Dock="Bottom">
-                <TreeView Name="treeView"></TreeView>
-                <ListView Height="200" Name="listView">
-                </ListView>
-            </StackPanel>
-        </ScrollViewer>
+        <StackPanel>
+            <ScrollViewer>
+                <TabControl  Name="tabControl">
+                    <TabItem Header="Tree" Name="tabTree">
+                        <TreeView Name="treeView" />
+                    </TabItem>
+                    <TabItem Header="Output" Name="tabOutput">
+                        <ListView Name="listView" />
+                    </TabItem>
+                </TabControl>
+            </ScrollViewer>
+            <ProgressBar Name="progressBar" Height="15" Width="150" Minimum="0" Maximum="100" Visibility="Collapsed" IsIndeterminate="True"/>
+        </StackPanel>
     </DockPanel>
 </Window>

@@ -1,23 +1,21 @@
-﻿using GenealogySoftwareV3.Types;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Schema;
+using WPFGedcomParser.Types;
 
 namespace WPFGedcomParser
 {
@@ -26,12 +24,27 @@ namespace WPFGedcomParser
     /// </summary>
     public partial class MainWindow : Window
     {
-        public readonly GEDCOMParser _gedcomParser;
+        private readonly GEDCOMParser _gedcomParser;
+        private string _gedcomFilePath;
         public MainWindow()
         {
             InitializeComponent();
             _gedcomParser = new GEDCOMParser();
             //this.DataContext = _dataContext;
+        }
+
+        private void BackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
+        {
+            //progressBar.Value = e.ProgressPercentage;
+        }
+
+        private async void BackgroundWorker_DoWork(object? sender, DoWorkEventArgs e)
+        {
+            //for (var i = 0; i < 10; i++)
+            //{
+            //    //await Task.Delay(TimeSpan.FromSeconds(0.01));
+            //    (sender as BackgroundWorker).ReportProgress(i);
+            //}
         }
 
         private void LoadTree()
@@ -58,10 +71,10 @@ namespace WPFGedcomParser
             {
                 return;
             }
-            
-            Title = System.IO.Path.GetFileName(openFileDialog.FileName);
+            _gedcomFilePath = openFileDialog.FileName;
 
-            DataTable fileData = _gedcomParser.ReadIntoDataTable(openFileDialog.FileName);
+            Title = System.IO.Path.GetFileName(_gedcomFilePath);
+            DataTable fileData = _gedcomParser.ReadIntoDataTable(_gedcomFilePath);
             _gedcomParser.ParseData(fileData);
 
             LoadTree();
@@ -77,13 +90,15 @@ namespace WPFGedcomParser
                 var country = distinctCountries.ElementAt(i);
                 listView.Items.Add(GetListViewItem(i, $"({i + 1}) {country}"));
             }
+
+            tabControl.SelectedIndex = 1;
         }
 
         private void btnShowSurmames_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
             var distinctSurnames = _gedcomParser.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
-            for(var i = 0; i < distinctSurnames.Count(); i++)
+            for (var i = 0; i < distinctSurnames.Count(); i++)
             {
                 var surname = distinctSurnames.ElementAt(i);
                 listView.Items.Add(GetListViewItem(i, $"({i + 1}) {surname}"));
@@ -91,11 +106,13 @@ namespace WPFGedcomParser
 
             listView.Items.Add(new ListViewItem { Content = "----------------------- Total individuals per surname ----------------------------------" });
             var surnameGroups = _gedcomParser.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
-            for(var i = 0; i < surnameGroups.Count(); i++)
+            for (var i = 0; i < surnameGroups.Count(); i++)
             {
                 var surnameGroup = surnameGroups.ElementAt(i);
                 listView.Items.Add(GetListViewItem(i, $"{surnameGroup.Key} [{surnameGroup.Count()}]"));
             }
+
+            tabControl.SelectedIndex = 1;
         }
 
         private void btnShowCausesOfDeathDistribution_Click(object sender, RoutedEventArgs e)
@@ -107,6 +124,8 @@ namespace WPFGedcomParser
                 var causeOfDeathGroup = causesOfDeathGroups.ElementAt(i);
                 listView.Items.Add(GetListViewItem(i, $"{causeOfDeathGroup.Key} [{causeOfDeathGroup.Count()}]"));
             }
+
+            tabControl.SelectedIndex = 1;
         }
 
         private Brush GetListItemBackgroundColor(int itemIndex)
@@ -116,20 +135,62 @@ namespace WPFGedcomParser
 
         private ListViewItem GetListViewItem(int itemIndex, string content)
         {
-            return new ListViewItem { Background = GetListItemBackgroundColor(itemIndex), BorderBrush = Brushes.Black, Content = content};
+            return new ListViewItem { Background = GetListItemBackgroundColor(itemIndex), BorderBrush = Brushes.Black, Content = content };
         }
 
         private void btnExportToJson_Click(object sender, RoutedEventArgs e)
         {
-            var json =
-                JsonConvert.SerializeObject(
-                new
-                {
-                    Individuals = _gedcomParser.Individuals.Values,
-                    Marriages = _gedcomParser.Marriages.Values
-                }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            progressBar.Visibility = Visibility.Visible;
 
-            File.WriteAllText($"gedcom-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.json", json);
+            //var folderBrowserDialog = new FolderBrowserDialog();
+            //openFileDialog.Multiselect = false;
+            //openFileDialog.Filter = "GEDCOM files (*.ged)|*.ged";
+            //openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //if (openFileDialog.ShowDialog() != true)
+            //{
+            //    return;
+            //}
+
+
+            /*
+                string newText = "abc";
+                form.Label.Invoke((MethodInvoker)delegate {
+                    // Running on the UI thread
+                    form.Label.Text = newText;
+                });
+            */
+            var backgroundWorker = new BackgroundWorker();
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged; ;
+
+            backgroundWorker.RunWorkerAsync();
+
+            var folderPath = Path.GetDirectoryName(_gedcomFilePath);
+            var fileName = $"gedcom-{Path.GetFileName(_gedcomFilePath)}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}";
+            var filePath = $"{Path.Combine(folderPath, fileName)}.json";
+
+            var exportTask = Task.Run(async () =>
+            {
+                var json =
+                    JsonConvert.SerializeObject(
+                    new
+                    {
+                        Individuals = _gedcomParser.Individuals.Values,
+                        Marriages = _gedcomParser.Marriages.Values
+                    }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+                
+                File.WriteAllText(filePath, json);
+
+                //await Task.Delay(5000);
+            });
+
+            //exportTask.Wait();
+
+            //Process.Start("explorer.exe", $"/e, /select, \"{filePath}\"");
+            Process.Start("explorer.exe", folderPath);
+            progressBar.Visibility = Visibility.Collapsed;
         }
     }
 }

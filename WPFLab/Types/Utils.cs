@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GenealogySoftwareV3.Types
+namespace WPFGedcomParser.Types
 {
     public static class Utils
     {

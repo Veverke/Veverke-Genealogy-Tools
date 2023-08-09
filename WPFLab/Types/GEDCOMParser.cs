@@ -7,7 +7,7 @@ using System.Data;
 using System.IO;
 using System.Windows.Controls;
 
-namespace GenealogySoftwareV3.Types
+namespace WPFGedcomParser.Types
 {
     public class GEDCOMParser : IGEDCOMParser
     {
