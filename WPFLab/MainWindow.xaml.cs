@@ -31,6 +31,7 @@ namespace WPFLab
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            treeView.Items.Clear();
             TreeViewItem rootTreeViewItem = new TreeViewItem { Header = "Family Tree" };
             List<int> rootMarriages = new List<int>(new int[] { 8, 135, 144 });
             Marriage rootMarriageMatch;
@@ -51,7 +52,7 @@ namespace WPFLab
             for (var i = 0; i < distinctCountries.Count(); i++)
             {
                 var country = distinctCountries.ElementAt(i);
-                listView.Items.Add(new ListViewItem { Content = $"({i + 1}) {country}" });
+                listView.Items.Add(GetListViewItem(i, $"({i + 1}) {country}"));
             }
         }
 
@@ -62,14 +63,15 @@ namespace WPFLab
             for(var i = 0; i < distinctSurnames.Count(); i++)
             {
                 var surname = distinctSurnames.ElementAt(i);
-                listView.Items.Add(new ListViewItem { Content = $"({i + 1}) {surname}" });
+                listView.Items.Add(GetListViewItem(i, $"({i + 1}) {surname}"));
             }
 
             listView.Items.Add(new ListViewItem { Content = "----------------------- Total individuals per surname ----------------------------------" });
             var surnameGroups = ofdGEDCOM.fileInterpreter.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
-            foreach(var surnameGroup in surnameGroups)
+            for(var i = 0; i < surnameGroups.Count(); i++)
             {
-                listView.Items.Add(new ListViewItem { Content = $"{surnameGroup.Key} [{surnameGroup.Count()}]" });
+                var surnameGroup = surnameGroups.ElementAt(i);
+                listView.Items.Add(GetListViewItem(i, $"{surnameGroup.Key} [{surnameGroup.Count()}]"));
             }
         }
 
@@ -77,10 +79,21 @@ namespace WPFLab
         {
             listView.Items.Clear();
             var causesOfDeathGroups = ofdGEDCOM.fileInterpreter.Individuals.GroupBy(i => i.Value.Death.CauseofDeath).OrderByDescending(g => g.Count());
-            foreach(var causeOfDeathGroup in causesOfDeathGroups)
+            for (var i = 0; i < causesOfDeathGroups.Count(); i++)
             {
-                listView.Items.Add(new ListViewItem { Content = $"{causeOfDeathGroup.Key} [{causeOfDeathGroup.Count()}]" });
+                var causeOfDeathGroup = causesOfDeathGroups.ElementAt(i);
+                listView.Items.Add(GetListViewItem(i, $"{causeOfDeathGroup.Key} [{causeOfDeathGroup.Count()}]"));
             }
+        }
+
+        private Brush GetListItemBackgroundColor(int itemIndex)
+        {
+            return itemIndex % 2 == 0 ? Brushes.White : Brushes.LightGray;
+        }
+
+        private ListViewItem GetListViewItem(int itemIndex, string content)
+        {
+            return new ListViewItem { Background = GetListItemBackgroundColor(itemIndex), BorderBrush = Brushes.Black, Content = content};
         }
     }
 }

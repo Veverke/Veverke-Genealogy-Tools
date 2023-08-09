@@ -227,6 +227,13 @@ namespace GenealogySoftwareV3.Types
                         mainTag.Tag = GEDCOMTags.MARR;
                         mainTag.childrenTags = 0;
                     }
+                    else if (tag == GEDCOMTags.CAUS.ToString())
+                    {
+                        if (Enum.TryParse<CauseOfDeath>(values[0], out CauseOfDeath causeOfDeath))
+                        {
+                            newIndividual.Death.CauseofDeath =  causeOfDeath;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

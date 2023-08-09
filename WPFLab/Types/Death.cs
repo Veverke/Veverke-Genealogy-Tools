@@ -7,7 +7,7 @@ namespace GenealogySoftwareV3.Types
 {
     public class Death : LifeEvent
     {
-        public CauseOfDeath CauseofDeath { get; private set; }
+        public CauseOfDeath CauseofDeath { get; set; }
 
         public override string ToString()
         {

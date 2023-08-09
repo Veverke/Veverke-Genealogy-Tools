@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Width="100">
     <DockPanel Margin="10">
-        <Button DockPanel.Dock="Top"  Name="btnOpenFile" Click="btnOpenFiles_Click" BorderBrush="GhostWhite" BorderThickness="1" FontSize="10">Open file</Button>
+        <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" DockPanel.Dock="Top"  Name="btnOpenFile" Click="btnOpenFiles_Click">Open file</Button>
         <ListBox DockPanel.Dock="Bottom" Name="lboxFiles" />
     </DockPanel>
 </UserControl>
