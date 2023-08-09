@@ -3,37 +3,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:myControls="clr-namespace:WPFLab"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" BorderBrush="Gold"  Background="SkyBlue">
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-            <myControls:OpenFileDialogComponent x:Name="ofdGEDCOM"/>
-            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Name="btnLoadTree" Click="Button_Click">Load Tree
-                <Button.Effect>
-                    <BlurEffect Radius="0.3"  KernelType="Gaussian"/>
-                    <!--<DropShadowEffect BlurRadius="3" Opacity="0.2" Color="Chocolate" />-->
-
-                </Button.Effect>
-            </Button>
-            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnShowGeographicDistribution" Click="btnShowGeographicDistribution_Click">
-                Geographic Distribution
-            </Button>
-            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnShowSurmames" Click="btnShowSurmames_Click">
-                Surnames
-            </Button>
-            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnShowCausesOfDeathDistribution" Click="btnShowCausesOfDeathDistribution_Click">
-                Causes Of Death Distribution
-            </Button>
-            <Button Background="Teal" Foreground="White" BorderThickness="1" FontSize="10" Margin="5" Name="btnExportToJson" Click="btnExportToJson_Click">
-                Export to JSON
-            </Button>
-        </StackPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Open GEDCOM File" Click="btnOpenFiles_Click"/>
+                <MenuItem Header="Export to JSON" Click="btnExportToJson_Click"/>
+            </MenuItem>
+            <MenuItem Header="Statistics">
+                <MenuItem Header="Geographic Distribution" Click="btnShowGeographicDistribution_Click" />
+                <MenuItem Header="Individuals Per Surname" Click="btnShowSurmames_Click"/>
+                <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
+            </MenuItem>
+        </Menu>
         <ScrollViewer>
             <StackPanel DockPanel.Dock="Bottom">
+                <TreeView Name="treeView"></TreeView>
                 <ListView Height="200" Name="listView">
                 </ListView>
-                <TreeView Name="treeView"></TreeView>
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

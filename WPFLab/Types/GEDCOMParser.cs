@@ -9,12 +9,12 @@ using System.Windows.Controls;
 
 namespace GenealogySoftwareV3.Types
 {
-    public class FileReader : IGEDCOMInterpreter
+    public class GEDCOMParser : IGEDCOMParser
     {
         public Dictionary<int, Individual> Individuals { get; set; }
         public Dictionary<int, Marriage> Marriages { get; set; }
 
-        public FileReader()
+        public GEDCOMParser()
         {
             Individuals = new Dictionary<int, Individual>();
             Marriages = new Dictionary<int, Marriage>();
@@ -26,7 +26,7 @@ namespace GenealogySoftwareV3.Types
             public int childrenTags;
         }
 
-        public DataTable LoadDataIntoDataTable(string filePath)
+        public DataTable ReadIntoDataTable(string filePath)
         {
             DataTable data = new DataTable("GEDCOM Original File");
             data.Columns.Add("ID", typeof(String));
@@ -88,7 +88,7 @@ namespace GenealogySoftwareV3.Types
 
 
 
-        public void InterpretFileContents(DataTable data)
+        public void ParseData(DataTable data)
         {
 
             TagAnalyzer mainTag;

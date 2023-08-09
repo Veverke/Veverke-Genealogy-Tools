@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GenealogySoftwareV3.Types;
 
-namespace GenealogySoftwareV3.Types
+namespace WPFLab.Types.LifeEvents
 {
     public class LifeEvent
     {

@@ -6,10 +6,10 @@ using System.Data;
 
 namespace GenealogySoftwareV3.Types
 {
-    public interface IGEDCOMInterpreter
+    public interface IGEDCOMParser
     {
-        DataTable LoadDataIntoDataTable(string filePath);
-        void InterpretFileContents(DataTable data);
+        DataTable ReadIntoDataTable(string filePath);
+        void ParseData(DataTable data);
         //Dictionary<int, Individual> GetIndividuals(DataTable data);
         //Dictionary<int, Marriage> GetFamilies(DataTable data);
     }

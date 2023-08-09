@@ -1,7 +1,9 @@
 ﻿using GenealogySoftwareV3.Types;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Schema;
 
 namespace WPFLab
 {
@@ -24,14 +27,16 @@ namespace WPFLab
     public partial class MainWindow : Window
     {
         GEDCOMDefails _dataContext;
+        public readonly GEDCOMParser _gedcomParser;
         public MainWindow()
         {
             InitializeComponent();
             _dataContext = new GEDCOMDefails();
+            _gedcomParser = new GEDCOMParser();
             this.DataContext = _dataContext;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void LoadTree()
         {
             treeView.Items.Clear();
             TreeViewItem rootTreeViewItem = new TreeViewItem { Header = "Family Tree" };
@@ -39,18 +44,36 @@ namespace WPFLab
             Marriage rootMarriageMatch;
 
             foreach (int rootMarriage in rootMarriages)
-                if (ofdGEDCOM.fileInterpreter.Marriages.TryGetValue(rootMarriage, out rootMarriageMatch))
-                    ofdGEDCOM.fileInterpreter.GenerateTree(rootTreeViewItem, rootMarriageMatch);
+                if (_gedcomParser.Marriages.TryGetValue(rootMarriage, out rootMarriageMatch))
+                    _gedcomParser.GenerateTree(rootTreeViewItem, rootMarriageMatch);
 
             treeView.Items.Add(rootTreeViewItem);
-
-            //ofdGEDCOM.fileInterpreter.GetFamiliesRoots();
         }
+
+        private void btnOpenFiles_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "GEDCOM files (*.ged)|*.ged";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+            
+            Title = System.IO.Path.GetFileName(openFileDialog.FileName);
+
+            DataTable fileData = _gedcomParser.ReadIntoDataTable(openFileDialog.FileName);
+            _gedcomParser.ParseData(fileData);
+
+            LoadTree();
+        }
+
 
         private void btnShowGeographicDistribution_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var distinctCountries = ofdGEDCOM.fileInterpreter.Individuals.Select(i => i.Value.Birth.Place.Country).Distinct().OrderBy(c => c);
+            var distinctCountries = _gedcomParser.Individuals.Select(i => i.Value.Birth.Place.Country).Distinct().OrderBy(c => c);
             for (var i = 0; i < distinctCountries.Count(); i++)
             {
                 var country = distinctCountries.ElementAt(i);
@@ -61,7 +84,7 @@ namespace WPFLab
         private void btnShowSurmames_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var distinctSurnames = ofdGEDCOM.fileInterpreter.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
+            var distinctSurnames = _gedcomParser.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
             for(var i = 0; i < distinctSurnames.Count(); i++)
             {
                 var surname = distinctSurnames.ElementAt(i);
@@ -69,7 +92,7 @@ namespace WPFLab
             }
 
             listView.Items.Add(new ListViewItem { Content = "----------------------- Total individuals per surname ----------------------------------" });
-            var surnameGroups = ofdGEDCOM.fileInterpreter.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
+            var surnameGroups = _gedcomParser.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
             for(var i = 0; i < surnameGroups.Count(); i++)
             {
                 var surnameGroup = surnameGroups.ElementAt(i);
@@ -80,7 +103,7 @@ namespace WPFLab
         private void btnShowCausesOfDeathDistribution_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var causesOfDeathGroups = ofdGEDCOM.fileInterpreter.Individuals.GroupBy(i => i.Value.Death.CauseofDeath).OrderByDescending(g => g.Count());
+            var causesOfDeathGroups = _gedcomParser.Individuals.GroupBy(i => i.Value.Death.CauseofDeath).OrderByDescending(g => g.Count());
             for (var i = 0; i < causesOfDeathGroups.Count(); i++)
             {
                 var causeOfDeathGroup = causesOfDeathGroups.ElementAt(i);
@@ -104,16 +127,8 @@ namespace WPFLab
                 JsonConvert.SerializeObject(
                 new
                 {
-                    //Individuals = new {
-                    //    ofdGEDCOM.fileInterpreter.Individuals.Values.Count,
-                    //    Individuals = ofdGEDCOM.fileInterpreter.Individuals.Values
-                    //},
-                    //Marriages = new {
-                    //    ofdGEDCOM.fileInterpreter.Marriages.Values.Count,
-                    //    Marriages = ofdGEDCOM.fileInterpreter.Marriages.Values
-                    //}
-                    Individuals = ofdGEDCOM.fileInterpreter.Individuals.Values,
-                    Marriages = ofdGEDCOM.fileInterpreter.Marriages.Values
+                    Individuals = _gedcomParser.Individuals.Values,
+                    Marriages = _gedcomParser.Marriages.Values
                 }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
             File.WriteAllText($"gedcom-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.json", json);
