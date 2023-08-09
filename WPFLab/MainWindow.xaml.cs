@@ -19,21 +19,19 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Schema;
 
-namespace WPFLab
+namespace WPFGedcomParser
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        GEDCOMDefails _dataContext;
         public readonly GEDCOMParser _gedcomParser;
         public MainWindow()
         {
             InitializeComponent();
-            _dataContext = new GEDCOMDefails();
             _gedcomParser = new GEDCOMParser();
-            this.DataContext = _dataContext;
+            //this.DataContext = _dataContext;
         }
 
         private void LoadTree()
