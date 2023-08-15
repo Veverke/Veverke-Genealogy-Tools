@@ -13,22 +13,41 @@
             </MenuItem>
             <MenuItem Header="Statistics">
                 <MenuItem Header="Geographic Distribution" Click="btnShowGeographicDistribution_Click" />
-                <MenuItem Header="Individuals Per Surname" Click="btnShowSurmames_Click"/>
+                <MenuItem Header="Surnames List" Click="btnShowSurnamesList" />
+                <MenuItem Header="Individuals Per Surname" Click="btn_ShowIndividualsPerSurname_Click"/>
                 <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
             </MenuItem>
         </Menu>
-        <StackPanel>
-            <ScrollViewer>
-                <TabControl  Name="tabControl">
-                    <TabItem Header="Tree" Name="tabTree">
-                        <TreeView Name="treeView" />
-                    </TabItem>
+        <DockPanel>
+            <TreeView Name="treeView" DockPanel.Dock="Left" MinWidth="200"/>
+
+                <TabControl  Name="tabControl" DockPanel.Dock="Top">
                     <TabItem Header="Output" Name="tabOutput">
-                        <ListView Name="listView" />
+
+                        <ScrollViewer DockPanel.Dock="Top">
+                            <ListView Name="listView" />
+
+                        </ScrollViewer>
+
+
                     </TabItem>
                 </TabControl>
-            </ScrollViewer>
-            <ProgressBar Name="progressBar" Height="15" Width="150" Minimum="0" Maximum="100" Visibility="Collapsed" IsIndeterminate="True"/>
-        </StackPanel>
+                <StatusBar Name="statusBar" DockPanel.Dock="Bottom"/>
+                <StatusBar VerticalAlignment="Bottom">
+                    <StatusBarItem>
+                        <Label Name="lblIndividuals"></Label>
+                    </StatusBarItem>
+                    <Separator/>
+                    <StatusBarItem>
+                        <ProgressBar Name="progressBar" Width="50" Minimum="0" Maximum="100" Visibility="Collapsed" IsIndeterminate="True"/>
+                    </StatusBarItem>
+                    <Separator/>
+                    <StatusBarItem>
+                        <Label Name="lblVersion"></Label>
+                    </StatusBarItem>
+                </StatusBar>
+
+ 
+        </DockPanel>
     </DockPanel>
 </Window>

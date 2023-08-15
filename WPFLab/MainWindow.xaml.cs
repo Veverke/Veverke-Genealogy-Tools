@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -78,12 +80,26 @@ namespace WPFGedcomParser
             _gedcomParser.ParseData(fileData);
 
             LoadTree();
+            lblIndividuals.Content = $"Individuals: [{_gedcomParser.Individuals.Count}]";
         }
 
 
         private void btnShowGeographicDistribution_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
+            //var countriesGroups = _gedcomParser.Individuals.GroupBy(i => i.Value.Birth.Place.County).Where(c => !string.IsNullOrEmpty(c.Key));
+            //countriesGroups.GroupJoin(_gedcomParser.Individuals.GroupBy(i => i.Value.Birth.Place.County).Where(c => !string.IsNullOrEmpty(c.Key)));
+            //for (var i = 0; i < countriesGroups.Count(); i++)
+            //{
+            //    var countryGroup = countriesGroups.ElementAt(i);
+            //    var citiesGroups = countryGroup.GroupBy(c => c.Value.Birth.Place.City);
+            //    for(var j = 0; j < citiesGroups.Count(); j++)
+            //    {
+            //        var cityGroup = citiesGroups.ElementAt(j);
+            //        listView.Items.Add(GetListViewItem(i + j, $"{countryGroup.Key}, {cityGroup.Key}"));
+            //    }    
+            //}
+
             var distinctCountries = _gedcomParser.Individuals.Select(i => i.Value.Birth.Place.Country).Distinct().OrderBy(c => c);
             for (var i = 0; i < distinctCountries.Count(); i++)
             {
@@ -94,17 +110,9 @@ namespace WPFGedcomParser
             tabControl.SelectedIndex = 1;
         }
 
-        private void btnShowSurmames_Click(object sender, RoutedEventArgs e)
+        private void btn_ShowIndividualsPerSurname_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var distinctSurnames = _gedcomParser.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
-            for (var i = 0; i < distinctSurnames.Count(); i++)
-            {
-                var surname = distinctSurnames.ElementAt(i);
-                listView.Items.Add(GetListViewItem(i, $"({i + 1}) {surname}"));
-            }
-
-            listView.Items.Add(new ListViewItem { Content = "----------------------- Total individuals per surname ----------------------------------" });
             var surnameGroups = _gedcomParser.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
             for (var i = 0; i < surnameGroups.Count(); i++)
             {
@@ -130,7 +138,7 @@ namespace WPFGedcomParser
 
         private Brush GetListItemBackgroundColor(int itemIndex)
         {
-            return itemIndex % 2 == 0 ? Brushes.White : Brushes.LightGray;
+            return itemIndex % 2 == 0 ? Brushes.AliceBlue : Brushes.SkyBlue;
         }
 
         private ListViewItem GetListViewItem(int itemIndex, string content)
@@ -191,6 +199,18 @@ namespace WPFGedcomParser
             //Process.Start("explorer.exe", $"/e, /select, \"{filePath}\"");
             Process.Start("explorer.exe", folderPath);
             progressBar.Visibility = Visibility.Collapsed;
+        }
+
+        private void btnShowSurnamesList(object sender, RoutedEventArgs e)
+        {
+            listView.Items.Clear();
+            var distinctSurnames = _gedcomParser.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
+            for (var i = 0; i < distinctSurnames.Count(); i++)
+            {
+                var surname = distinctSurnames.ElementAt(i);
+                listView.Items.Add(GetListViewItem(i, $"({i + 1}) {surname}"));
+            }
+            tabControl.SelectedIndex = 1;
         }
     }
 }
