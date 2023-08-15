@@ -19,7 +19,7 @@
             </MenuItem>
         </Menu>
         <DockPanel>
-            <TreeView Name="treeView" DockPanel.Dock="Left" MinWidth="200"/>
+            <TreeView Name="treeView" DockPanel.Dock="Left" MinWidth="200" SelectedItemChanged="treeView_SelectedItemChanged"/>
 
                 <TabControl  Name="tabControl" DockPanel.Dock="Top">
                     <TabItem Header="Output" Name="tabOutput">

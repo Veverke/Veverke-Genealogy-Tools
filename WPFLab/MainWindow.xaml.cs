@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,9 @@ namespace WPFGedcomParser
     {
         private readonly GEDCOMParser _gedcomParser;
         private string _gedcomFilePath;
+        private string _lastMenuAction;
+        private Dictionary<int, Marriage> _selectedTreeItemRelevantMarriages;
+        private Dictionary<int, Individual> _selectedTreeItemRelevantIndividuals;
         public MainWindow()
         {
             InitializeComponent();
@@ -49,15 +53,48 @@ namespace WPFGedcomParser
             //}
         }
 
+        private void collectAncestorsMarriages(int individualId, Dictionary<string, int> ancestorsMarriages)
+        {
+            if (individualId == 0)
+            {
+                return;
+            }
+
+            if (ancestorsMarriages == null)
+            {
+                ancestorsMarriages = new Dictionary<string, int>();
+            }
+
+            var ancestorsMarriage = _gedcomParser.Marriages.FirstOrDefault(m => m.Value.Children.Contains(individualId));
+
+            if (ancestorsMarriage.Key == 0)
+            {
+                //oldest ancestor for current family
+                var familyName = _gedcomParser.Individuals[individualId].Surnames.FirstOrDefault();
+                if (!string.IsNullOrEmpty(familyName))
+                {
+                    ancestorsMarriages.Add(familyName, _gedcomParser.Individuals[individualId].MarriageIDs.FirstOrDefault());
+                }
+                return;
+            }
+            var key = _gedcomParser.Individuals[ancestorsMarriage.Value.Husband].Surnames.FirstOrDefault();
+
+            collectAncestorsMarriages(ancestorsMarriage.Value.Husband, ancestorsMarriages);
+            collectAncestorsMarriages(ancestorsMarriage.Value.Wife, ancestorsMarriages);
+
+        }
+
         private void LoadTree()
         {
             treeView.Items.Clear();
             TreeViewItem rootTreeViewItem = new TreeViewItem { Header = "Family Tree" };
-            List<int> rootMarriages = new List<int>(new int[] { 8, 135, 144 });
-            Marriage rootMarriageMatch;
+            //List<int> rootMarriages = new List<int>(new int[] { 8, 135, 144 });
+            var dicMarriages = new Dictionary<string, int>();
+            collectAncestorsMarriages(1, dicMarriages);
 
+            var rootMarriages = dicMarriages.Select(m => m.Value);
             foreach (int rootMarriage in rootMarriages)
-                if (_gedcomParser.Marriages.TryGetValue(rootMarriage, out rootMarriageMatch))
+                if (_gedcomParser.Marriages.TryGetValue(rootMarriage, out Marriage rootMarriageMatch))
                     _gedcomParser.GenerateTree(rootTreeViewItem, rootMarriageMatch);
 
             treeView.Items.Add(rootTreeViewItem);
@@ -108,6 +145,7 @@ namespace WPFGedcomParser
             }
 
             tabControl.SelectedIndex = 1;
+            _lastMenuAction = nameof(btnShowGeographicDistribution_Click);
         }
 
         private void btn_ShowIndividualsPerSurname_Click(object sender, RoutedEventArgs e)
@@ -121,6 +159,7 @@ namespace WPFGedcomParser
             }
 
             tabControl.SelectedIndex = 1;
+            _lastMenuAction = nameof(btn_ShowIndividualsPerSurname_Click);
         }
 
         private void btnShowCausesOfDeathDistribution_Click(object sender, RoutedEventArgs e)
@@ -134,6 +173,7 @@ namespace WPFGedcomParser
             }
 
             tabControl.SelectedIndex = 1;
+            _lastMenuAction = nameof(btnShowCausesOfDeathDistribution_Click);
         }
 
         private Brush GetListItemBackgroundColor(int itemIndex)
@@ -144,6 +184,26 @@ namespace WPFGedcomParser
         private ListViewItem GetListViewItem(int itemIndex, string content)
         {
             return new ListViewItem { Background = GetListItemBackgroundColor(itemIndex), BorderBrush = Brushes.Black, Content = content };
+        }
+
+        private Individual getOldestAncestor(int indivualId)
+        {
+            var ancestorMarriage = _gedcomParser.Marriages.FirstOrDefault(m => m.Value.Children.Contains(indivualId));
+            if (ancestorMarriage.Key == 0)
+            {
+                return _gedcomParser.Individuals[indivualId];
+            }
+
+            if (ancestorMarriage.Value.Husband != 0)
+            {
+                return getOldestAncestor(ancestorMarriage.Value.Husband);
+            }
+            else if(ancestorMarriage.Value.Wife != 0)
+            {
+                return getOldestAncestor(ancestorMarriage.Value.Wife);
+            }
+
+            return null;
         }
 
         private void btnExportToJson_Click(object sender, RoutedEventArgs e)
@@ -211,6 +271,18 @@ namespace WPFGedcomParser
                 listView.Items.Add(GetListViewItem(i, $"({i + 1}) {surname}"));
             }
             tabControl.SelectedIndex = 1;
+        }
+
+        private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (listView.Items.Count == 0)
+            {
+                return;
+            }
+
+            listView.Items.Clear();
+            this.GetType().GetMethod(_lastMenuAction).Invoke(null, new object[] { this, RoutedEventArgs.Empty });
+
         }
     }
 }
