@@ -117,7 +117,7 @@ namespace WPFGedcomParser.Types
                     if (tag.StartsWith("@I"))
                     {
                         individualID = GetRecordID(exp, tag);
-                        newIndividual = new Individual();
+                        newIndividual = new Individual(individualID);
                         Individuals.Add(individualID, newIndividual);
                     }
                     else if (tag == GEDCOMTags.GIVN.ToString())
@@ -294,6 +294,32 @@ namespace WPFGedcomParser.Types
 
 
         //}
+
+        public (Individual father, Individual mother) GetParents(int individualId)
+        {
+            var individual = Individuals.FirstOrDefault(i => i.Key == individualId);
+            if (individual.Value == null)
+            {
+                return (null, null);
+            }
+
+            var individualParentsMarriage = Marriages.FirstOrDefault(m => m.Value.Children.Contains(individualId));
+            if (individualParentsMarriage.Value == null)
+            {
+                return (null, null);
+            }
+
+            var father = Individuals.FirstOrDefault(i => i.Key == individualParentsMarriage.Value.Husband);
+            var mother = Individuals.FirstOrDefault(i => i.Key == individualParentsMarriage.Value.Wife);
+
+            return (father.Value, mother.Value);
+        }
+
+        public IEnumerable<Individual> GetLeafs()
+        {
+            return Individuals.Where(i => i.Value.MarriageIDs.Count == 0).Select(i => i.Value);
+        }
+
         public List<KeyValuePair<int, Individual>> GetFamiliesRoots()
         {
             List<KeyValuePair<int, Individual>> familiesRoots = new List<KeyValuePair<int, Individual>>();

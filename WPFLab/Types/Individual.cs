@@ -10,7 +10,7 @@ namespace WPFGedcomParser.Types
 {
     public class Individual
     {
-        //public int ID { get; private set; }
+        public int ID { get; private set; }
         public List<string> Names { get; set; }
         public List<string> Surnames { get; set; }
         public Sex Sex { get; set; }
@@ -32,8 +32,9 @@ namespace WPFGedcomParser.Types
         //    AttachedFiles = new List<AttachedFile>();
         //}
 
-        public Individual()
+        public Individual(int id)
         {
+            ID = id;
             Names = new List<string>();
             Surnames = new List<string>();
             MarriageIDs = new List<int>();
@@ -60,6 +61,21 @@ namespace WPFGedcomParser.Types
             //    deathDate = Death.Date.Dates[0].ToShortDateString();
 
             return string.Format("[{0}],[{1}],[{2}],[{3}]", GetNames(), GetSurnames(), Birth.Date, Death.Date);
+        }
+
+        public bool LikelyNeverMarried()
+        {
+            if (!Birth.Date.IsUnknown && !Death.Date.IsUnknown)
+            {
+                var lifespan = Death.Date.Dates.First() - Birth.Date.Dates.First();
+                //I am guessing that individuals that lived less than 15 years did not marry...
+                if (lifespan < TimeSpan.FromDays(365 * 15))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public string GetNames()

@@ -65,19 +65,19 @@ namespace WPFGedcomParser
                 ancestorsMarriages = new Dictionary<string, int>();
             }
 
-            var ancestorsMarriage = _gedcomParser.Marriages.FirstOrDefault(m => m.Value.Children.Contains(individualId));
+            var ancestorsMarriage = _selectedTreeItemRelevantMarriages.FirstOrDefault(m => m.Value.Children.Contains(individualId));
 
             if (ancestorsMarriage.Key == 0)
             {
                 //oldest ancestor for current family
-                var familyName = _gedcomParser.Individuals[individualId].Surnames.FirstOrDefault();
+                var familyName = _selectedTreeItemRelevantIndividuals[individualId].Surnames.FirstOrDefault();
                 if (!string.IsNullOrEmpty(familyName))
                 {
-                    ancestorsMarriages.Add(familyName, _gedcomParser.Individuals[individualId].MarriageIDs.FirstOrDefault());
+                    ancestorsMarriages.Add(familyName, _selectedTreeItemRelevantIndividuals[individualId].MarriageIDs.FirstOrDefault());
                 }
                 return;
             }
-            var key = _gedcomParser.Individuals[ancestorsMarriage.Value.Husband].Surnames.FirstOrDefault();
+            var key = _selectedTreeItemRelevantIndividuals[ancestorsMarriage.Value.Husband].Surnames.FirstOrDefault();
 
             collectAncestorsMarriages(ancestorsMarriage.Value.Husband, ancestorsMarriages);
             collectAncestorsMarriages(ancestorsMarriage.Value.Wife, ancestorsMarriages);
@@ -88,6 +88,8 @@ namespace WPFGedcomParser
         {
             treeView.Items.Clear();
             TreeViewItem rootTreeViewItem = new TreeViewItem { Header = "Family Tree" };
+            _selectedTreeItemRelevantIndividuals = _gedcomParser.Individuals;
+            _selectedTreeItemRelevantMarriages = _gedcomParser.Marriages;
             //List<int> rootMarriages = new List<int>(new int[] { 8, 135, 144 });
             var dicMarriages = new Dictionary<string, int>();
             collectAncestorsMarriages(1, dicMarriages);
@@ -98,6 +100,7 @@ namespace WPFGedcomParser
                     _gedcomParser.GenerateTree(rootTreeViewItem, rootMarriageMatch);
 
             treeView.Items.Add(rootTreeViewItem);
+
         }
 
         private void btnOpenFiles_Click(object sender, RoutedEventArgs e)
@@ -137,7 +140,7 @@ namespace WPFGedcomParser
             //    }    
             //}
 
-            var distinctCountries = _gedcomParser.Individuals.Select(i => i.Value.Birth.Place.Country).Distinct().OrderBy(c => c);
+            var distinctCountries = _selectedTreeItemRelevantIndividuals.Select(i => i.Value.Birth.Place.Country).Distinct().OrderBy(c => c);
             for (var i = 0; i < distinctCountries.Count(); i++)
             {
                 var country = distinctCountries.ElementAt(i);
@@ -151,7 +154,7 @@ namespace WPFGedcomParser
         private void btn_ShowIndividualsPerSurname_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var surnameGroups = _gedcomParser.Individuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
+            var surnameGroups = _selectedTreeItemRelevantIndividuals.GroupBy(i => string.Join(",", i.Value.Surnames)).OrderByDescending(g => g.Count());
             for (var i = 0; i < surnameGroups.Count(); i++)
             {
                 var surnameGroup = surnameGroups.ElementAt(i);
@@ -165,7 +168,7 @@ namespace WPFGedcomParser
         private void btnShowCausesOfDeathDistribution_Click(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var causesOfDeathGroups = _gedcomParser.Individuals.GroupBy(i => i.Value.Death.CauseofDeath).OrderByDescending(g => g.Count());
+            var causesOfDeathGroups = _selectedTreeItemRelevantIndividuals.GroupBy(i => i.Value.Death.CauseofDeath).OrderByDescending(g => g.Count());
             for (var i = 0; i < causesOfDeathGroups.Count(); i++)
             {
                 var causeOfDeathGroup = causesOfDeathGroups.ElementAt(i);
@@ -188,10 +191,10 @@ namespace WPFGedcomParser
 
         private Individual getOldestAncestor(int indivualId)
         {
-            var ancestorMarriage = _gedcomParser.Marriages.FirstOrDefault(m => m.Value.Children.Contains(indivualId));
+            var ancestorMarriage = _selectedTreeItemRelevantMarriages.FirstOrDefault(m => m.Value.Children.Contains(indivualId));
             if (ancestorMarriage.Key == 0)
             {
-                return _gedcomParser.Individuals[indivualId];
+                return _selectedTreeItemRelevantIndividuals[indivualId];
             }
 
             if (ancestorMarriage.Value.Husband != 0)
@@ -244,8 +247,8 @@ namespace WPFGedcomParser
                     JsonConvert.SerializeObject(
                     new
                     {
-                        Individuals = _gedcomParser.Individuals.Values,
-                        Marriages = _gedcomParser.Marriages.Values
+                        Individuals = _selectedTreeItemRelevantIndividuals.Values,
+                        Marriages = _selectedTreeItemRelevantMarriages.Values
                     }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
                 
@@ -264,7 +267,7 @@ namespace WPFGedcomParser
         private void btnShowSurnamesList(object sender, RoutedEventArgs e)
         {
             listView.Items.Clear();
-            var distinctSurnames = _gedcomParser.Individuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
+            var distinctSurnames = _selectedTreeItemRelevantIndividuals.SelectMany(i => i.Value.Surnames).Distinct().OrderBy(s => s);
             for (var i = 0; i < distinctSurnames.Count(); i++)
             {
                 var surname = distinctSurnames.ElementAt(i);
@@ -281,8 +284,48 @@ namespace WPFGedcomParser
             }
 
             listView.Items.Clear();
+            
             this.GetType().GetMethod(_lastMenuAction).Invoke(null, new object[] { this, RoutedEventArgs.Empty });
 
+        }
+
+        private void mni_Features_GetLeafs(object sender, RoutedEventArgs e)
+        {
+            string _getSurname(Individual individual)
+            {
+                var individualSurname = individual.GetSurnames();
+                if (!string.IsNullOrEmpty(individualSurname))
+                {
+                    return individualSurname;
+                }
+
+                var fatherSurname = _gedcomParser.GetParents(individual.ID).father?.GetSurnames();
+                if (!string.IsNullOrEmpty(fatherSurname))
+                {
+                    return fatherSurname;
+                }
+
+                return string.Empty;
+            }
+
+            listView.Items.Clear();
+            var leafs = _gedcomParser.GetLeafs().Where(l => !l.LikelyNeverMarried()).OrderBy(leaf => _getSurname(leaf));
+            for(var i = 0; i < leafs.Count(); i++)
+            {
+                var leaf = leafs.ElementAt(i);
+                var parents = _gedcomParser.GetParents(leaf.ID);
+                var birth = leaf.Birth.Date.Dates?.Count > 0 ? leaf.Birth.Date.Dates.FirstOrDefault().ToString("yyyy-MM-dd") : string.Empty;
+                var death = leaf.Death.Date.Dates?.Count > 0 ? leaf.Death.Date.Dates.FirstOrDefault().ToString("yyyy-MM-dd") : string.Empty;
+                listView.Items.Add(GetListViewItem(i, $"Family: [{_getSurname(leaf)}]   Name: [{leaf.GetNames()}]   Father: [{parents.father?.GetNames() ?? string.Empty}]   Mother: [{parents.mother?.GetNames() ?? string.Empty}]   Birth: [{birth}]   Death: [{death}]"));
+            }
+            tabControl.SelectedIndex = 1;
+        }
+
+        private void ListViewScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            ScrollViewer scv = (ScrollViewer)sender;
+            scv.ScrollToVerticalOffset(scv.VerticalOffset - (e.Delta /10));
+            e.Handled = true;
         }
     }
 }

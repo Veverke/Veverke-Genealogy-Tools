@@ -15,6 +15,14 @@ namespace WPFGedcomParser.Types
             Dates = new List<DateTime>();
         }
 
+        public bool IsUnknown
+        {
+            get
+            {
+                return Dates == null || Dates.Count == 0;
+            }
+        }
+
         public override string ToString()
         {
             if (Dates.Count > 0)

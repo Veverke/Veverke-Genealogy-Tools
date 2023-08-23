@@ -17,6 +17,9 @@
                 <MenuItem Header="Individuals Per Surname" Click="btn_ShowIndividualsPerSurname_Click"/>
                 <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
             </MenuItem>
+            <MenuItem Header="Features">
+                <MenuItem Header="Get Leafs" Click="mni_Features_GetLeafs" />
+            </MenuItem>
         </Menu>
         <DockPanel>
             <TreeView Name="treeView" DockPanel.Dock="Left" MinWidth="200" SelectedItemChanged="treeView_SelectedItemChanged"/>
@@ -24,7 +27,7 @@
                 <TabControl  Name="tabControl" DockPanel.Dock="Top">
                     <TabItem Header="Output" Name="tabOutput">
 
-                        <ScrollViewer DockPanel.Dock="Top">
+                        <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
                             <ListView Name="listView" />
 
                         </ScrollViewer>
