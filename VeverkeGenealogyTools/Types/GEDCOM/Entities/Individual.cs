@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using WPFLab.Types.LifeEvents;
 
-namespace WPFGedcomParser.Types
+namespace WPFGedcomParser.Types.GEDCOM.Entities
 {
     public class Individual
     {

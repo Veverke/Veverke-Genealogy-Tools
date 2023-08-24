@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WPFGedcomParser.Types
+namespace WPFGedcomParser.Types.GEDCOM.Entities
 {
     public class PieceOfData
     {
