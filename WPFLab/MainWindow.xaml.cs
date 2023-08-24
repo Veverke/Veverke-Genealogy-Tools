@@ -19,6 +19,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Schema;
 using WPFGedcomParser.Types;
+using WPFGedcomParser.Types.GEDCOM;
+using WPFGedcomParser.Types.GEDCOM.Entities;
 
 namespace WPFGedcomParser
 {

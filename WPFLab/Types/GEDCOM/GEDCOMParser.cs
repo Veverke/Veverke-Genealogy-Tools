@@ -6,8 +6,10 @@ using System.Text.RegularExpressions;
 using System.Data;
 using System.IO;
 using System.Windows.Controls;
+using WPFGedcomParser.Types.GEDCOM.Entities;
+using WPFGedcomParser.Types.LifeEvents.Components;
 
-namespace WPFGedcomParser.Types
+namespace WPFGedcomParser.Types.GEDCOM
 {
     public class GEDCOMParser : IGEDCOMParser
     {

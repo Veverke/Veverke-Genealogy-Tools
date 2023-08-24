@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WPFGedcomParser.Types;
+using WPFGedcomParser.Types.LifeEvents.Components;
 
 namespace WPFLab.Types.LifeEvents
 {

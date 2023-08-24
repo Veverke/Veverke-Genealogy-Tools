@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WPFGedcomParser.Types.GEDCOM.Entities;
 
-namespace WPFGedcomParser.Types
+namespace WPFGedcomParser.Types.LifeEvents.Components
 {
     public class Date : PieceOfData
     {

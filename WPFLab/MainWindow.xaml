@@ -10,47 +10,53 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open GEDCOM File" Click="btnOpenFiles_Click"/>
                 <MenuItem Header="Export to JSON" Click="btnExportToJson_Click"/>
+                <MenuItem Header="Import Yizkor Book DB File"/>
             </MenuItem>
-            <MenuItem Header="Statistics">
-                <MenuItem Header="Geographic Distribution" Click="btnShowGeographicDistribution_Click" />
-                <MenuItem Header="Surnames List" Click="btnShowSurnamesList" />
-                <MenuItem Header="Individuals Per Surname" Click="btn_ShowIndividualsPerSurname_Click"/>
-                <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
-            </MenuItem>
-            <MenuItem Header="Features">
-                <MenuItem Header="Get Leafs" Click="mni_Features_GetLeafs" />
-            </MenuItem>
+                    <MenuItem Header="Statistics">
+                        <MenuItem Header="Geographic Distribution" Click="btnShowGeographicDistribution_Click" />
+                        <MenuItem Header="Surnames List" Click="btnShowSurnamesList" />
+                        <MenuItem Header="Individuals Per Surname" Click="btn_ShowIndividualsPerSurname_Click"/>
+                        <MenuItem Header="Deaths Per Cause" Click="btnShowCausesOfDeathDistribution_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Features">
+                        <MenuItem Header="List Leafs" Click="mni_Features_GetLeafs" />
+                    </MenuItem>
         </Menu>
         <DockPanel>
             <TreeView Name="treeView" DockPanel.Dock="Left" MinWidth="200" SelectedItemChanged="treeView_SelectedItemChanged"/>
 
-                <TabControl  Name="tabControl" DockPanel.Dock="Top">
-                    <TabItem Header="Output" Name="tabOutput">
+            <TabControl  Name="tabControl" DockPanel.Dock="Top">
+                <TabItem Header="Output" Name="tabOutput">
+                    <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
+                        <ListView Name="listView" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Yizkor Book" Name="tabYizkorBook">
+                    <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
+                        <StackPanel Orientation="Vertical">
+                            <TextBox Name="txtYbSearch"/>
+                            <Separator />
+                            <ListView Name="listViewYizkorBook" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+            <StatusBar Name="statusBar" DockPanel.Dock="Bottom"/>
+            <StatusBar VerticalAlignment="Bottom">
+                <StatusBarItem>
+                    <Label Name="lblIndividuals"></Label>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem>
+                    <ProgressBar Name="progressBar" Width="50" Minimum="0" Maximum="100" Visibility="Collapsed" IsIndeterminate="True"/>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem>
+                    <Label Name="lblVersion"></Label>
+                </StatusBarItem>
+            </StatusBar>
 
-                        <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
-                            <ListView Name="listView" />
 
-                        </ScrollViewer>
-
-
-                    </TabItem>
-                </TabControl>
-                <StatusBar Name="statusBar" DockPanel.Dock="Bottom"/>
-                <StatusBar VerticalAlignment="Bottom">
-                    <StatusBarItem>
-                        <Label Name="lblIndividuals"></Label>
-                    </StatusBarItem>
-                    <Separator/>
-                    <StatusBarItem>
-                        <ProgressBar Name="progressBar" Width="50" Minimum="0" Maximum="100" Visibility="Collapsed" IsIndeterminate="True"/>
-                    </StatusBarItem>
-                    <Separator/>
-                    <StatusBarItem>
-                        <Label Name="lblVersion"></Label>
-                    </StatusBarItem>
-                </StatusBar>
-
- 
         </DockPanel>
     </DockPanel>
 </Window>
