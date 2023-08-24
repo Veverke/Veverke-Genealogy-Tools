@@ -346,10 +346,17 @@ namespace VeverkeGenealogyTools
             _yizkorBookDbFilePath = openFileDialog.FileName;
             DAL dAL = new DAL(_yizkorBookDbFilePath);
             var pages = dAL.ExecuteScalar<int>($"SELECT COUNT(1) FROM Page");
-            lblYbName.Content = $"Yizkor book db loaded: [{Path.GetFileName(_yizkorBookDbFilePath)}] Pages: [{pages}]";
+            lblYbName.Content = $"Yizkor book db loaded: [{Path.GetFileNameWithoutExtension(_yizkorBookDbFilePath).Split('-').FirstOrDefault()}] Pages: [{pages}]";
+            lblYbSearchResults.Content = string.Empty;
 
             listViewYizkorBook.Items.Clear();
             tabControl.SelectedIndex = 1;
+
+            var leftOverPagesFromPreviousSession = Directory.GetFiles(".", "Page*.jpg");
+            foreach(var page in leftOverPagesFromPreviousSession)
+            {
+                File.Delete(page);
+            }
         }
 
         private void btnSearchYB_Click(object sender, RoutedEventArgs e)
@@ -382,11 +389,12 @@ namespace VeverkeGenealogyTools
             foreach (object selectedItem in listViewYizkorBook.SelectedItems)
             {
                 var selectedYBSearchResult = (YBSearchResult)selectedItem;
-                int num2 = 56632812 + selectedYBSearchResult.Page;
+                int.TryParse(Path.GetFileNameWithoutExtension(_yizkorBookDbFilePath).Split('-').LastOrDefault(), out int startingImgId);
+                int imgId = startingImgId + selectedYBSearchResult.Page;
                 destinationFileName = $"Page {selectedYBSearchResult.Page}.jpg";
                 if (!File.Exists(destinationFileName))
                 {
-                    webClient.DownloadFile($"https://images.nypl.org/index.php?id={num2}&t=w", destinationFileName);
+                    webClient.DownloadFile($"https://images.nypl.org/index.php?id={imgId}&t=w", destinationFileName);
                 }
             }
             if (File.Exists(destinationFileName))
