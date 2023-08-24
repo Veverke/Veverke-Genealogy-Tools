@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WPFGedcomParser.Types
+namespace VeverkeGenealogyTools.Types
 {
     public static class Utils
     {

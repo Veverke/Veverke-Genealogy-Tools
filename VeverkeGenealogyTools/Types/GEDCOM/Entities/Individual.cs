@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-using WPFLab.Types.LifeEvents;
+using VeverkeGenealogyTools.Types.LifeEvents;
 
-namespace WPFGedcomParser.Types.GEDCOM.Entities
+namespace VeverkeGenealogyTools.Types.GEDCOM.Entities
 {
     public class Individual
     {

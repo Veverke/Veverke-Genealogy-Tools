@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WPFLab.Types.LifeEvents;
+using VeverkeGenealogyTools.Types.LifeEvents;
 
-namespace WPFGedcomParser.Types.GEDCOM.Entities
+namespace VeverkeGenealogyTools.Types.GEDCOM.Entities
 {
     public class Marriage : LifeEvent
     {

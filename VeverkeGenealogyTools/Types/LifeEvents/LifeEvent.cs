@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WPFGedcomParser.Types;
-using WPFGedcomParser.Types.LifeEvents.Components;
+using VeverkeGenealogyTools.Types;
+using VeverkeGenealogyTools.Types.LifeEvents.Components;
 
-namespace WPFLab.Types.LifeEvents
+namespace VeverkeGenealogyTools.Types.LifeEvents
 {
     public class LifeEvent
     {

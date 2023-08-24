@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WPFGedcomParser.Types.GEDCOM.Entities;
+using VeverkeGenealogyTools.Types.GEDCOM.Entities;
 
-namespace WPFGedcomParser.Types.LifeEvents.Components
+namespace VeverkeGenealogyTools.Types.LifeEvents.Components
 {
     public class Date : PieceOfData
     {

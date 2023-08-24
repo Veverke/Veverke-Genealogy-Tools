@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Data;
 using System.IO;
 using System.Windows.Controls;
-using WPFGedcomParser.Types.GEDCOM.Entities;
-using WPFGedcomParser.Types.LifeEvents.Components;
+using VeverkeGenealogyTools.Types.GEDCOM.Entities;
+using VeverkeGenealogyTools.Types.LifeEvents.Components;
 
-namespace WPFGedcomParser.Types.GEDCOM
+namespace VeverkeGenealogyTools.Types.GEDCOM
 {
     public class GEDCOMParser : IGEDCOMParser
     {

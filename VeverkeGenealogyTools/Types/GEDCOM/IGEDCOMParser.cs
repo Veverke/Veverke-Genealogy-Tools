@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace WPFGedcomParser.Types.GEDCOM
+namespace VeverkeGenealogyTools.Types.GEDCOM
 {
     public interface IGEDCOMParser
     {

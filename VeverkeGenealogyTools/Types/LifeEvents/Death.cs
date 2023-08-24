@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WPFGedcomParser.Types;
+using VeverkeGenealogyTools.Types;
 
-namespace WPFLab.Types.LifeEvents
+namespace VeverkeGenealogyTools.Types.LifeEvents
 {
     public class Death : LifeEvent
     {

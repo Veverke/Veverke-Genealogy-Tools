@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace WPFGedcomParser.Types.GEDCOM.Entities
+namespace VeverkeGenealogyTools.Types.GEDCOM.Entities
 {
     public class AttachedFile
     {

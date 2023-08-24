@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 
-namespace WPFGedcomParser.Types.SQLiteDAL
+namespace VeverkeGenealogyTools.Types.SQLiteDAL
 {
     public class DAL
     {
