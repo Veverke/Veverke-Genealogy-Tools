@@ -35,14 +35,12 @@
                     <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
                         <StackPanel Orientation="Vertical">
                             <Label Name="lblYbName" Margin="10"/>
-                            <Separator Margin="0 3" />
                             <StackPanel Orientation="Horizontal">
                                 <TextBox Width="100" Name="txtYbSearch" Margin="20 0"/>
                                 <Separator />
                                 <Button x:Name="btnSearchYB" Width="50" Margin="50 0" Click="btnSearchYB_Click">Search</Button>
                             </StackPanel>
-                            <Separator />
-                            <ListView Name="listViewYizkorBook" SelectionChanged="listViewYizkorBook_SelectionChanged">
+                            <ListView Name="listViewYizkorBook" Margin="0 10 0 0" SelectionChanged="listViewYizkorBook_SelectionChanged">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="Page" Width="120">

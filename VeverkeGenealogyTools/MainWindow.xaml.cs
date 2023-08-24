@@ -344,7 +344,9 @@ namespace WPFGedcomParser
                 return;
             }
             _yizkorBookDbFilePath = openFileDialog.FileName;
-            lblYbName.Content = $"Yizkor book db loaded: [{Path.GetFileName(_yizkorBookDbFilePath)}]";
+            DAL dAL = new DAL(_yizkorBookDbFilePath);
+            var pages = dAL.ExecuteScalar<int>($"SELECT COUNT(1) FROM Page");
+            lblYbName.Content = $"Yizkor book db loaded: [{Path.GetFileName(_yizkorBookDbFilePath)}] Pages: [{pages}]";
 
             listViewYizkorBook.Items.Clear();
             tabControl.SelectedIndex = 1;
@@ -385,7 +387,10 @@ namespace WPFGedcomParser
                 var selectedYBSearchResult = (YBSearchResult)selectedItem;
                 int num2 = 56632812 + selectedYBSearchResult.Page;
                 destinationFileName = $"Page {selectedYBSearchResult.Page}.jpg";
-                webClient.DownloadFile($"https://images.nypl.org/index.php?id={num2}&t=w", destinationFileName);
+                if (!File.Exists(destinationFileName))
+                {
+                    webClient.DownloadFile($"https://images.nypl.org/index.php?id={num2}&t=w", destinationFileName);
+                }
             }
             if (File.Exists(destinationFileName))
             {
