@@ -361,6 +361,9 @@ namespace WPFGedcomParser
             listViewYizkorBook.Items.Clear();
             DAL dAL = new DAL(_yizkorBookDbFilePath);
             DataTable dataTable = dAL.Query($"\r\n                SELECT\r\n                    p.number as Page,\r\n                    l.number as Line,\r\n                    w.number as Word\r\n                    FROM\r\n                    Word w \r\n                    JOIN Line l on l.id = w.LineId\r\n                    JOIN Page p ON p.id = l.PageId\r\n                    WHERE\r\n                    w.text LIKE '%{txtYbSearch.Text}%'\r\n                    ORDER BY\r\n                    page,\r\n                    line,\r\n                    word\r\n            ");
+            
+            lblYbSearchResults.Content = dataTable.Rows.Count == 0 ? $"No entries found. Try another term." : $"{dataTable.Rows.Count} entries found. Clicking a given page column in the result grid will download and open that book page.";
+            
             foreach (DataRow row in dataTable.Rows)
             {
                 int.TryParse(row["page"]?.ToString(), out var page);
