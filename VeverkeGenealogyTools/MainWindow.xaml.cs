@@ -366,13 +366,7 @@ namespace WPFGedcomParser
                 int.TryParse(row["page"]?.ToString(), out var page);
                 int.TryParse(row["line"]?.ToString(), out var line);
                 int.TryParse(row["word"]?.ToString(), out var word);
-                //ListViewItem listViewItem = new ListViewItem 
-                //{
-                //    Content = result.ToString()
-                //};
 
-                //listViewItem.Items.Add(result2.ToString());
-                //listViewItem.Items.Add(result3.ToString());
                 listViewYizkorBook.Items.Add(new YBSearchResult(page, line, word));
             }
         }
