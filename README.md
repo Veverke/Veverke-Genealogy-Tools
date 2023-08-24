@@ -1,5 +1,5 @@
 # Veverke Genealogy Tools
-A software suite providing features not available out-of-the-box in the popular family tree softwares out there
+A genealogy software suite providing features not available out-of-the-box in the popular family tree softwares out there
 
 # Features:
 1. Statistics:  
@@ -10,4 +10,4 @@ A software suite providing features not available out-of-the-box in the popular 
 
 2. Export GEDCOM data to JSON
 3. List Leafs
-4. Import Yizkor Book SQLite DB File
+4. **Import Yizkor Book SQLite DB File**
