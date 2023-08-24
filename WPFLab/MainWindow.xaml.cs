@@ -9,6 +9,7 @@ using System.Diagnostics.Metrics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,6 +22,7 @@ using System.Xml.Schema;
 using WPFGedcomParser.Types;
 using WPFGedcomParser.Types.GEDCOM;
 using WPFGedcomParser.Types.GEDCOM.Entities;
+using WPFGedcomParser.Types.SQLiteDAL;
 
 namespace WPFGedcomParser
 {
@@ -31,6 +33,7 @@ namespace WPFGedcomParser
     {
         private readonly GEDCOMParser _gedcomParser;
         private string _gedcomFilePath;
+        private string _yizkorBookDbFilePath;
         private string _lastMenuAction;
         private Dictionary<int, Marriage> _selectedTreeItemRelevantMarriages;
         private Dictionary<int, Individual> _selectedTreeItemRelevantIndividuals;
@@ -328,6 +331,66 @@ namespace WPFGedcomParser
             ScrollViewer scv = (ScrollViewer)sender;
             scv.ScrollToVerticalOffset(scv.VerticalOffset - (e.Delta /10));
             e.Handled = true;
+        }
+
+        private void mni_File_ImportYbDb(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "SQLite db files (*.db)|*.db";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+            _yizkorBookDbFilePath = openFileDialog.FileName;
+            lblYbName.Content = $"Yizkor book db loaded: [{Path.GetFileName(_yizkorBookDbFilePath)}]";
+
+            listViewYizkorBook.Items.Clear();
+            tabControl.SelectedIndex = 1;
+        }
+
+        private void btnSearchYB_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtYbSearch.Text))
+            {
+                return;
+            }
+            listViewYizkorBook.Items.Clear();
+            DAL dAL = new DAL(_yizkorBookDbFilePath);
+            DataTable dataTable = dAL.Query($"\r\n                SELECT\r\n                    p.number as Page,\r\n                    l.number as Line,\r\n                    w.number as Word\r\n                    FROM\r\n                    Word w \r\n                    JOIN Line l on l.id = w.LineId\r\n                    JOIN Page p ON p.id = l.PageId\r\n                    WHERE\r\n                    w.text LIKE '%{txtYbSearch.Text}%'\r\n                    ORDER BY\r\n                    page,\r\n                    line,\r\n                    word\r\n            ");
+            foreach (DataRow row in dataTable.Rows)
+            {
+                int.TryParse(row["page"]?.ToString(), out var page);
+                int.TryParse(row["line"]?.ToString(), out var line);
+                int.TryParse(row["word"]?.ToString(), out var word);
+                //ListViewItem listViewItem = new ListViewItem 
+                //{
+                //    Content = result.ToString()
+                //};
+
+                //listViewItem.Items.Add(result2.ToString());
+                //listViewItem.Items.Add(result3.ToString());
+                listViewYizkorBook.Items.Add(new YBSearchResult(page, line, word));
+            }
+        }
+
+        private void listViewYizkorBook_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            using WebClient webClient = new WebClient();
+            string text = string.Empty;
+            string destinationFileName = string.Empty;
+            foreach (object selectedItem in listViewYizkorBook.SelectedItems)
+            {
+                var selectedYBSearchResult = (YBSearchResult)selectedItem;
+                int num2 = 56632812 + selectedYBSearchResult.Page;
+                destinationFileName = $"Page {selectedYBSearchResult.Page}.jpg";
+                webClient.DownloadFile($"https://images.nypl.org/index.php?id={num2}&t=w", destinationFileName);
+            }
+            if (File.Exists(destinationFileName))
+            {
+                Process.Start("explorer.exe", destinationFileName);
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open GEDCOM File" Click="btnOpenFiles_Click"/>
                 <MenuItem Header="Export to JSON" Click="btnExportToJson_Click"/>
-                <MenuItem Header="Import Yizkor Book DB File"/>
+                <MenuItem Header="Import Yizkor Book DB File" Click="mni_File_ImportYbDb"/>
             </MenuItem>
                     <MenuItem Header="Statistics">
                         <MenuItem Header="Geographic Distribution" Click="btnShowGeographicDistribution_Click" />
@@ -31,12 +31,32 @@
                         <ListView Name="listView" />
                     </ScrollViewer>
                 </TabItem>
-                <TabItem Header="Yizkor Book" Name="tabYizkorBook">
+                <TabItem Header="Yizkor Book" Name="tabYizkorBook" Height="20" VerticalAlignment="Bottom">
                     <ScrollViewer DockPanel.Dock="Top" PreviewMouseWheel="ListViewScrollViewer_PreviewMouseWheel">
                         <StackPanel Orientation="Vertical">
-                            <TextBox Name="txtYbSearch"/>
+                            <Label Name="lblYbName" Margin="10"/>
+                            <Separator Margin="0 3" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="100" Name="txtYbSearch" Margin="20 0"/>
+                                <Separator />
+                                <Button x:Name="btnSearchYB" Width="50" Margin="50 0" Click="btnSearchYB_Click">Search</Button>
+                            </StackPanel>
                             <Separator />
-                            <ListView Name="listViewYizkorBook" />
+                            <ListView Name="listViewYizkorBook" SelectionChanged="listViewYizkorBook_SelectionChanged">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Page" Width="120">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Page}" TextDecorations="Underline" Foreground="Blue" Cursor="Hand" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Line" Width="50"  DisplayMemberBinding="{Binding Line}"  />
+                                        <GridViewColumn Header="Word" Width="150" DisplayMemberBinding="{Binding Word}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
