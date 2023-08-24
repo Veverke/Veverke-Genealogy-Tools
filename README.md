@@ -1,5 +1,5 @@
-# WPF-Gedcom-Parser
-Parses GEDCOM files to provide features not available out-of-the-box in the popular family tree softwrares out there
+# Veverke Genealogy Tools
+A software suite providing features not available out-of-the-box in the popular family tree softwares out there
 
 # Features:
 1. Statistics:  
